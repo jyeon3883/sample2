@@ -1,8 +1,8 @@
 "use client";
 
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { AdminDashboard } from "./AdminDashboard";
+import { Typography } from "@repo/ui";
+import { AdminDashboardPanel } from "@/features/adminDashboard";
 
 export function AdminHomePage() {
   return (
@@ -14,7 +14,7 @@ export function AdminHomePage() {
         관리자 현황을 한 눈에 확인할 수 있습니다.
       </Typography>
       <Box>
-        <AdminDashboard />
+        <AdminDashboardPanel />
       </Box>
     </main>
   );

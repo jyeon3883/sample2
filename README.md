@@ -118,7 +118,7 @@ $env:APP_TARGET="admin"; pnpm codegen
 
 | 계층 | 폴더 | 역할 / 설명 | 예시 |
 | --- | --- | --- | --- |
-| 1 | `src/app/` | 앱 시작 시 한 번만 세팅하는 곳 | `AppProviders`, 헤더, 사이드바 |
+| 1 | `src/app/` | 앱 시작 시 한 번만 세팅하는 곳 | `AppProviders` |
 | 2 | `src/views/` | 특정 URL에 보이는 화면 | `NoticePage`, `QnaPage` |
 | 3 | `src/features/` | 사용자가 하는 행동 하나 | 공지사항 검색, Q&A 작성 |
 | 4 | `src/shared/` | 어디에나 쓰는 공통 설정/유틸 | `routes.ts` |
@@ -300,22 +300,29 @@ export const TAB_ROUTES: Record<string, TabRouteConfig> = {
 ```
 
 > **왜 routes.ts 에만 추가하면 되나요?**  
-> `app/(main)/layout.tsx`가 `TAB_ROUTES`를 읽어 탭을 자동으로 생성합니다.  
-> layout.tsx 는 건드릴 필요가 없습니다.
+> `app/(main)/layout.tsx`가 `appShellConfig.tabRoutes`(= `TAB_ROUTES`)를 읽어 탭을 자동으로 생성합니다.  
+> layout.tsx 는 건드릴 필요가 없습니다. 사이드바 메뉴만 추가하려면 `appShell.ts`의 `menuItems`를 수정하세요.
 
 ---
 
 ### Step 5 — 사이드바 메뉴 추가 (선택)
 
-사이드바에도 메뉴가 보이게 하려면 `src/app/layout/appSidebar/ui/AppSidebar.tsx` 를 수정합니다.
+사이드바 메뉴는 `src/shared/config/appShell.ts` 의 `menuItems`에 추가합니다.  
+헤더/사이드바 UI는 `@repo/ui/layout/mdi-shell`이 공통으로 렌더링합니다.
 
 ```ts
-const menuItems = [
-  { label: "홈", href: routes.home },
-  { label: "공지사항", href: routes.notice },
-  { label: "Q&A", href: routes.qna },
-  { label: "FAQ", href: routes.faq }, // ← 추가
-];
+// src/shared/config/appShell.ts
+export const appShellConfig: AppShellConfig = {
+  appId: "web",
+  tabRoutes: TAB_ROUTES,
+  menuItems: [
+    { label: "홈", href: routes.home },
+    { label: "공지사항", href: routes.notice },
+    { label: "Q&A", href: routes.qna },
+    { label: "FAQ", href: routes.faq }, // ← 추가
+  ],
+  headerTitle: "Web App",
+};
 ```
 
 ---
@@ -392,22 +399,31 @@ next-tanstack-monorepo/
 │   │   │       ├── notice/page.tsx # /notice → 공지사항
 │   │   │       └── qna/page.tsx    # /qna → Q&A
 │   │   ├── src/
-│   │   │   ├── app/                # 앱 영역 설정 (Provider, 헤더, 사이드바)
+│   │   │   ├── app/                # 앱 영역 설정 (Provider)
 │   │   │   ├── views/              # 화면 조립 (view 단위)
 │   │   │   │   ├── home/
 │   │   │   │   ├── notice/
 │   │   │   │   └── qna/
 │   │   │   ├── features/           # 기능 단위 (로직 + UI 조각)
-│   │   │   └── shared/             # 공통 설정/유틸
+│   │   │   └── shared/             # 공통 설정/유틸 (routes, appShell)
 │   │   ├── .env.dev                 # 개발 환경 (커밋 가능)
 │   │   ├── .env.prod                # 운영 환경 (커밋 가능)
 │   │   ├── .env.local               # 로컬 오버라이드 (gitignore)
 │   │   └── next.config.ts
 │   └── admin/                      # Admin 샘플 앱 (localhost:3100)
 │       ├── app/
-│       │   ├── layout.tsx
-│       │   └── page.tsx
-│       ├── src/app/providers/
+│       │   ├── layout.tsx          # 루트 레이아웃
+│       │   ├── (auth)/login/       # /login → 관리자 로그인
+│       │   └── (main)/
+│       │       ├── layout.tsx      # MdiMainLayout 연결
+│       │       ├── page.tsx        # / → 대시보드
+│       │       ├── users/page.tsx  # /users → 사용자 관리
+│       │       └── settings/page.tsx # /settings → 설정
+│       ├── src/
+│       │   ├── app/providers/
+│       │   ├── views/              # home, users, settings, login
+│       │   ├── features/           # adminDashboard, userManage, adminSettings
+│       │   └── shared/config/      # routes.ts, appShell.ts
 │       ├── .env.dev
 │       ├── .env.prod
 │       ├── .env.local
@@ -473,7 +489,7 @@ src/features/
 | 버튼·Input 등 범용 UI인가요? | `@repo/ui` (packages/ui) |
 | API 호출 코드인가요? | `@repo/api-client` |
 
-**실제 예시: 공지사항 검색 기능**
+**실제 예시: 공지사항 검색 기능 (web)**
 
 ```
 src/features/noticeSearch/
@@ -487,6 +503,22 @@ src/features/noticeSearch/
 src/views/notice/
 └── ui/
     └── NoticePage.tsx    → NoticeSearchPanel 배치
+```
+
+**실제 예시: 사용자 관리 (admin)**
+
+```
+src/features/userManage/
+├── model/
+│   ├── types.ts           → User 타입
+│   └── useUserManage.ts   → useTabState로 검색/목록 유지
+├── ui/
+│   └── UserManagePanel.tsx
+└── index.ts
+
+src/views/users/
+└── ui/
+    └── UsersPage.tsx      → UserManagePanel 배치
 ```
 
 ---
@@ -701,14 +733,47 @@ const { register, handleSubmit, formState: { errors } } = useForm<FaqFormValues>
 
 ## MDI — 탭 시스템
 
-> 관련 파일: `packages/ui/src/layout/mdi-shell/`, `src/shared/config/routes.ts`, `app/(main)/layout.tsx`
+> 관련 파일: `packages/ui/src/layout/mdi-shell/`, `packages/ui/src/layout/mdi/`, `src/shared/config/routes.ts`, `src/shared/config/appShell.ts`, `app/(main)/layout.tsx`
 
 화면 전환 없이 여러 페이지를 탭으로 열어 두는 시스템입니다.  
 탭 목록과 활성 탭은 `localStorage`에 자동 저장되어 새로고침 후에도 복원됩니다.
 
+### 레이아웃 연결 (앱 공통)
+
+각 앱의 `app/(main)/layout.tsx`는 `MdiMainLayout`에 `AppShellConfig`만 주입합니다.
+
+```tsx
+"use client";
+
+import { MdiMainLayout } from "@repo/ui/layout/mdi-shell";
+import { appShellConfig } from "@/shared/config/appShell";
+
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  return <MdiMainLayout config={appShellConfig}>{children}</MdiMainLayout>;
+}
+```
+
+```ts
+// src/shared/config/appShell.ts
+import type { AppShellConfig } from "@repo/ui/layout/mdi-shell";
+import { routes, TAB_ROUTES } from "./routes";
+
+export const appShellConfig: AppShellConfig = {
+  appId: "web", // admin 앱은 "admin"
+  tabRoutes: TAB_ROUTES,
+  menuItems: [
+    { label: "홈", href: routes.home },
+    { label: "공지사항", href: routes.notice },
+  ],
+  headerTitle: "Web App",
+};
+```
+
 ### 새 페이지를 탭으로 추가하는 방법
 
-`src/shared/config/routes.ts` 의 `TAB_ROUTES` 에만 탭을 추가하면 됩니다.  
+1. `src/shared/config/routes.ts` 의 `TAB_ROUTES`에 탭을 추가합니다.
+2. (선택) `src/shared/config/appShell.ts` 의 `menuItems`에 사이드바 메뉴를 추가합니다.
+
 `app/(main)/layout.tsx` 는 수정하지 않아도 자동으로 반영됩니다.
 
 ```ts
@@ -721,6 +786,8 @@ export const TAB_ROUTES: Record<string, TabRouteConfig> = {
   },
 };
 ```
+
+> **admin 샘플 화면:** 대시보드(`/`), 사용자 관리(`/users`), 설정(`/settings`) — 설정 탭은 `useTabState` + `useRegisterTabClose` 패턴을 사용합니다.
 
 ---
 
@@ -737,11 +804,11 @@ export const TAB_ROUTES: Record<string, TabRouteConfig> = {
 **사용 방법** — `useState` 와 동일하게 씁니다.
 
 ```tsx
-import { useTabState } from "@repo/ui/layout/mdi-shell";
+import { useTabState } from "@repo/ui/layout/mdi";
 
 function QnaPage() {
-  // useState("/qna", false) 와 같은 방식으로 사용
-  // 첫 번째 인자가 초기값이고, 두 번째 인자는 탭 ID(URL 경로)입니다.
+  // useState와 같은 방식으로 사용
+  // 첫 번째 인자는 탭 ID(URL 경로), 두 번째 인자는 초기값입니다.
   const [draftOpen, setDraftOpen] = useTabState("/qna", false);
 
   return (
@@ -799,7 +866,7 @@ function QnaPage() {
 > 현재 활성 탭에서만 동작합니다.
 
 ```tsx
-import { useTabState, useRegisterTabClose } from "@repo/ui/layout/mdi-shell";
+import { useTabState, useRegisterTabClose } from "@repo/ui/layout/mdi";
 
 interface NoticeForm {
   title: string;
@@ -842,16 +909,22 @@ export function NoticePage() {
 
 ```
 packages/ui/src/layout/mdi-shell/
-├── index.ts                  → 외부에서 import 할 수 있는 목록
-├── MdiTabContext.tsx          → openTab / closeTab / activateTab 로직
-├── MdiTabBar.tsx              → 상단 탭 UI
-├── MdiTabPanel.tsx            → 탭 내용 패널 (활성 탭만 마운트)
-├── useMdiTabStore.ts          → 탭 목록/활성 탭 상태 (Zustand)
-├── useTabState.ts             → useTabState 훅
-└── useRegisterTabClose.ts    → useRegisterTabClose 훅
+├── MdiMainLayout.tsx         → 앱 공통 MDI 레이아웃 (AppShellConfig 주입)
+├── AppHeader.tsx             → 공통 헤더
+├── AppSidebar.tsx            → 공통 사이드바
+└── types.ts                  → AppShellConfig, TabRouteConfig
 
-src/shared/config/routes.ts   → TAB_ROUTES 등록 (여기만 수정하면 됨)
-app/(main)/layout.tsx          → MDI 레이아웃 (수정 불필요)
+packages/ui/src/layout/mdi/
+├── MdiTabContext.tsx         → openTab / closeTab / activateTab 로직
+├── MdiTabBar.tsx             → 상단 탭 UI
+├── MdiTabPanel.tsx           → 탭 내용 패널
+├── useMdiTabStore.ts         → 탭 목록/활성 탭 상태 (Zustand)
+├── useTabState.ts            → useTabState 훅
+└── useRegisterTabClose.ts   → useRegisterTabClose 훅
+
+src/shared/config/routes.ts   → TAB_ROUTES 등록
+src/shared/config/appShell.ts → menuItems, headerTitle, appId
+app/(main)/layout.tsx         → MdiMainLayout 연결 (수정 거의 불필요)
 ```
 
 ---
