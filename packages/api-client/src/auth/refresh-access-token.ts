@@ -1,4 +1,5 @@
 import axios from "axios";
+import { publicEnv } from "@repo/env/public";
 
 import { AUTH_REFRESH_PATH } from "./constants";
 import { persistAuthTokens } from "./persist-tokens";
@@ -7,7 +8,7 @@ import { clearAuthTokens, getRefreshToken } from "./token-storage";
 
 /** 인터셉터 루프 방지: 메인 AXIOS_INSTANCE와 분리된 클라이언트 */
 const refreshClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080",
+  baseURL: publicEnv.NEXT_PUBLIC_API_URL,
   headers: { "Content-Type": "application/json" },
 });
 

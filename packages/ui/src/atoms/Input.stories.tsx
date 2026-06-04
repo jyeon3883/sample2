@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Input, TextField } from "./input";
+import { Input, TextField } from "./Input";
 
 const meta = {
   title: "Atoms/Input",

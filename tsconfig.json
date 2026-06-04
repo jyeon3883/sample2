@@ -1,24 +1,15 @@
 {
-  "extends": "@repo/typescript-config/nextjs.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "plugins": [{ "name": "next" }],
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/application/*": ["./src/application/*"],
-      "@/screens/*": ["./src/screens/*"],
-      "@/widgets/*": ["./src/widgets/*"],
-      "@/features/*": ["./src/features/*"],
-      "@/entities/*": ["./src/entities/*"],
-      "@/shared/*": ["./src/shared/*"]
-    }
+    "strict": true,
+    "skipLibCheck": true
   },
-  "include": [
-    "next-env.d.ts",
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": ["node_modules", "packages"]
+  "files": [],
+  "references": [
+    { "path": "./packages/env" },
+    { "path": "./packages/api-client" },
+    { "path": "./packages/query" },
+    { "path": "./packages/types" },
+    { "path": "./packages/ui" }
+  ]
 }

@@ -1,884 +1,763 @@
 # next-tanstack-monorepo
 
-단일 Next.js 앱 + 공유 패키지 monorepo (React **19.2.1**, Next **16.1.0**)
-
-## 주요 라이브러리 버전
-
-| 분류                | 라이브러리                   | 버전        |
-| ------------------- | ---------------------------- | ----------- |
-| **런타임**          | Node.js                      | `>=20`      |
-| **패키지 매니저**   | pnpm                         | `10.26.1`   |
-| **빌드**            | Turbo                        | `^2.8.0`    |
-| **프레임워크**      | Next.js                      | `16.1.0`    |
-| **UI**              | React                        | `19.2.1`    |
-| **UI**              | React DOM                    | `19.2.1`    |
-| **UI 컴포넌트**     | MUI (Material UI)            | `^7.3.11`   |
-| **UI 컴포넌트**     | MUI Icons                    | `^7.3.11`   |
-| **스타일**          | Emotion React                | `^11.14.0`  |
-| **스타일**          | Emotion Styled               | `^11.14.1`  |
-| **서버 상태**       | TanStack Query (React Query) | `^5.100.14` |
-| **HTTP 클라이언트** | Axios                        | `^1.16.1`   |
-| **코드 생성**       | Orval                        | `^8.12.3`   |
-| **스키마 검증**     | Zod                          | `^4.4.3`    |
-| **폼**              | React Hook Form              | `^7.77.0`   |
-| **폼**              | @hookform/resolvers          | `^5.4.0`    |
-| **차트**            | ECharts                      | `^6.1.0`    |
-| **차트**            | echarts-for-react            | `^3.0.6`    |
-| **클라이언트 상태** | Zustand                      | `^5.0.14`   |
-| **스토리북**        | Storybook                    | `10.4.1`    |
-| **언어**            | TypeScript                   | `^5.8.3`    |
-| **린터**            | ESLint                       | `^9.28.0`   |
-| **포매터**          | Prettier                     | `^3.8.3`    |
+멀????`apps/web`, `apps/admin`) + 공유 ?�키지 monorepo (React **19.2.1**, Next **16.1.0**)
 
 ---
 
-## md 파일 뷰어
+## 빠른 ?�작
 
-MarkMaid View
+> 처음 ?�로?�트�?받았?�면 ?�기???�작?�니??
 
-## pnpm 설치
-
-npm install -g pnpm@latest-11
-
-pnpm 설치후
-pnpm i or pnpm install
-
----
-
-## 권장 VSCode 확장 프로그램
-
-VSCode 확장 프로그램 탭에서 아래 항목들을 검색하여 설치합니다.
-
-| 확장 ID                  | 이름       | 설명                                             |
-| ------------------------ | ---------- | ------------------------------------------------ |
-| `dbaeumer.vscode-eslint` | ESLint     | JS/TS 린팅 규칙 적용                             |
-| `esbenp.prettier-vscode` | Prettier   | 코드 자동 포매팅                                 |
-| `eamodio.gitlens`        | GitLens    | Git blame, 히스토리, 브랜치 등 강력한 Git 시각화 |
-| `usernamehw.errorlens`   | Error Lens | 에러/경고를 해당 코드 줄에 인라인으로 표시       |
-
----
-
-## ESLint / Prettier 설정
-
-### 1. 확장 프로그램 설치
-
-VSCode 확장 프로그램 탭에서 아래 두 가지를 검색하여 설치합니다.
-
-- `dbaeumer.vscode-eslint` — ESLint
-- `esbenp.prettier-vscode` — Prettier
-
-### 2. 패키지 설치
-
-프로젝트 루트에서 실행합니다.
+### 1. ?�전 준�?
+Node.js 20 ?�상???�요?�니?? 버전 ?�인:
 
 ```bash
-pnpm add -D prettier eslint-config-prettier
+node -v   # v20.x.x ?�상?�어???�니??```
+
+### 2. pnpm ?�치
+
+```bash
+npm install -g pnpm@10.26.1
 ```
 
-### 3. `.prettierrc` 생성 (프로젝트 루트)
+### 3. ?�존???�치 �??�행
 
-```json
-{
-  "semi": true,
-  "singleQuote": false,
-  "tabWidth": 2,
-  "trailingComma": "es5",
-  "printWidth": 100,
-  "endOfLine": "lf"
-}
+```powershell
+corepack enable
+corepack prepare pnpm@10.26.1 --activate
+pnpm install
+pnpm dev:web
+pnpm dev:admin
 ```
 
-### 4. `eslint.config.mjs` 수정
+### 4. ?�행 ?�인
 
-`eslint-config-prettier`를 가장 마지막에 추가해야 Prettier와 충돌하는 ESLint 규칙이 비활성화됩니다.
+- Web ?? [http://localhost:3000](http://localhost:3000)
+- Admin ?�플 ?? [http://localhost:3100](http://localhost:3100)
 
-```js
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
-import prettier from "eslint-config-prettier";
+### 5. 환경 변수 준비
+루트 `.env.example`을 참고해 아래 env 파일만 사용합니다.
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  prettier, // ← 반드시 마지막에 위치
-  globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    "node_modules/**",
-    "packages/**/node_modules/**",
-    "packages/ui/storybook-static/**",
-    "**/*.tsbuildinfo",
-  ]),
-]);
-
-export default eslintConfig;
-```
-
-### 5. `.vscode/settings.json` 생성 (프로젝트 루트)
-
-```json
-{
-  "eslint.useFlatConfig": true,
-  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-  "[javascriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" }
-}
-```
-
-> 설정 후 VSCode를 재시작하거나 `Ctrl+Shift+P` → **ESLint: Restart ESLint Server** 를 실행합니다.
-
----
-
-## 명명 규칙 (Naming Convention)
-
-| 대상 | 규칙 | 예시 |
+| 파일 | 용도 | 커밋 |
 | ---- | ---- | ---- |
-| **폴더 (slice 이름)** | camelCase | `qnaCreate/`, `apiPlayground/`, `zustandDemo/` |
-| **React 컴포넌트 파일** | PascalCase | `QnaCreateForm.tsx`, `AppHeader.tsx` |
-| **훅 파일** | camelCase (`use` 접두사 유지) | `useQnaForm.ts`, `useTabState.ts` |
-| **스토어 / 모델 파일** | camelCase | `volatileStore.ts`, `persistentStore.ts` |
-| **타입 / 설정 / 유틸 파일** | camelCase | `types.ts`, `routes.ts` |
-| **배럴 파일** | 항상 `index.ts` 고정 | `index.ts` |
-| **Next.js 예약 파일** | Next.js 규약 유지 (변경 불가) | `page.tsx`, `layout.tsx`, `globals.css` |
-| **CSS 모듈** | 컴포넌트와 동일한 이름, 소문자 유지 | `qcell.module.css` |
+| `.env.dev` | 개발 환경 기본값 | 가능 |
+| `.env.prod` | 운영 환경 기본값 | 가능 |
+| `.env.local` | 로컬 개인 오버라이드 | 금지 (gitignore) |
 
-**요약: 폴더 camelCase · 컴포넌트 PascalCase · 그 외 camelCase**
+로드 위치 (우선순위: 루트 → 앱 → `.env.local`):
+- 루트: `.env.dev` / `.env.prod` (공통 변수)
+- `apps/web`, `apps/admin`: 앱 전용 변수
 
-```
-src/features/
-└── qnaCreate/                  ← 폴더: camelCase
-    ├── model/
-    │   └── useQnaForm.ts       ← 훅: camelCase
-    ├── ui/
-    │   └── QnaCreateForm.tsx   ← 컴포넌트: PascalCase
-    └── index.ts                ← 배럴: 항상 index.ts
+Orval codegen은 `APP_TARGET`에 따라 해당 앱 env를 우선 로드합니다.
+
+```powershell
+# web 기�? codegen
+pnpm codegen
+
+# admin 기�? codegen (?�요 ??
+$env:APP_TARGET="admin"; pnpm codegen
 ```
 
-> **왜 이 규칙인가?**
->
-> - 폴더 이름에 하이픈(`-`)이 포함되면 일부 도구(ESLint import 플러그인, shell 등)에서 따옴표 처리가 필요합니다. camelCase는 JavaScript 식별자로 바로 사용할 수 있어 import 경로가 깔끔합니다.
-> - 컴포넌트 파일은 내보내는 함수와 이름을 일치시켜 파일만 봐도 어떤 컴포넌트인지 바로 알 수 있습니다.
-> - `index.ts`는 barrel 역할로 항상 고정합니다.
+### ?�크립트 목록
+
+| 명령               | ?�명                              |
+| ------------------ | --------------------------------- |
+| `pnpm dev:web`     | web 개발 ?�버 (localhost:3000)    |
+| `pnpm dev:admin`   | admin 개발 ?�버 (localhost:3100)  |
+| `pnpm build`       | ?�크?�페?�스 ?�체 빌드 (Turbo)    |
+| `pnpm build:web`   | web ??빌드                       |
+| `pnpm build:admin` | admin ??빌드                     |
+| `pnpm lint`        | ESLint 검??                      |
+| `pnpm typecheck`   | TypeScript ?�??검??             |
+| `pnpm codegen`     | Orval API ?�라?�언???�성         |
+| `pnpm storybook`   | ?�토리북 (localhost:6006)         |
+
+### ??구조 ?�내
+
+| ?�치 | ??�� |
+| --- | --- |
+| `apps/web/app/` | Next.js App Router ?�우??진입??|
+| `apps/web/src/` | web ??비즈?�스 코드 (FSD 계층) |
+| `apps/admin/app/` | Admin Next.js App Router |
+| `apps/admin/src/` | admin ???�용 코드 |
+| `packages/env/` | ?�별 ?�경변??Zod 검�?모듈 |
+| `packages/` | 공유 ?�프???�키지 (ui, api-client, query, types) |
 
 ---
 
-## 폴더 구조 (단일 서비스용)
+## ?�로?�트 ?�해?�기
 
-`apps/` 없이 **루트가 Next 앱**, 공통 코드만 `packages/`에 둡니다.
+### ???�로?�트???�떤 구조?��???
 
-```
-next-tanstack-monorepo/
-├── app/                    # Next 라우트만 (얇은 re-export)
-│   ├── layout.tsx
-│   ├── page.tsx
-│   └── (board)/notice|qna/
-├── src/                    # FSD (Feature-Sliced Design)
-│   ├── application/        # FSD app 레이어 (providers, Next app/ 과 구분)
-│   ├── screens/            # 화면 조립 (FSD pages — Next pages/ 와 충돌 방지)
-│   ├── widgets/            # 큰 UI 블록
-│   ├── features/           # 유스케이스
-│   ├── entities/           # 도메인 개념
-│   └── shared/             # 앱 전용 공통 (config, lib)
-├── public/
-├── packages/               # FSD shared 인프라 (UI, API, Query)
-│   ├── api-client/         # Orval + axios
-│   ├── query/              # TanStack Query
-│   ├── ui/                 # MUI, ECHARTS, QCELL , storybook
-│   ├── types/
-│   └── config-typescript/
-├── next.config.ts
-├── package.json            # Next 앱 + workspace 루트
-├── pnpm-workspace.yaml     # packages/* 만 포함
-└── turbo.json
-```
+"**URL ?�나 = ???�나**" 방식?�로 ?�작?�는 MDI(Multiple Document Interface) ?�입?�다.  
+공�??�항 ??�� ?�고 Q&A ??�� ?�어??????�� ?�시???��??�니??
 
-## FSD 레이어 규칙
+코드?????�역?�로 ?�뉩?�다.
 
-의존 방향은 **위 → 아래**만 허용합니다. 같은 레이어의 다른 slice끼리 import는 하지 않습니다.
+| ?�역 | ?�치 | ?�명 |
+| --- | --- | --- |
+| ??코드 | `app/`, `src/` | ???�로?�트?�서�??�용?�는 ?�면/기능 |
+| 공통 ?�키지 | `packages/` | ?�러 ?�로?�트?�서 ?�사??가?�한 ?�프??|
+
+### URL???�면???�시?�기까�?
+
+브라?��??�서 `/notice` �??�력?�면 ?�음 ?�서�?코드가 ?�행?�니??
 
 ```
-app/ (Next)  →  screens  →  widgets  →  features  →  entities  →  shared / packages
+브라?��? /notice ?�속
+       ??app/(main)/(board)/notice/page.tsx   ??Next.js가 ?�우?��? 찾음 (?��? 진입??
+       ??src/views/notice/ui/NoticePage.tsx   ???�면??조립?�는 ?�이지 컴포?�트
+       ??src/features/noticeSearch/           ???�제 검??로직�?UI
 ```
 
-| 레이어             | 역할                                                                        | 이 레포 예시                                              |
-| ------------------ | --------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `app/` (Next)      | URL, `layout`, `metadata`. 비즈니스 로직 없음                               | `app/page.tsx` → `@/screens/home` re-export               |
-| `src/application/` | FSD app 레이어 — Provider, 초기화                                           | `AppProviders` (MUI + Query + Theme)                      |
-| `src/screens/`     | **한 라우트 화면** 조립. FSD의 pages                                        | `home`, `notice`, `qna`                                   |
-| `src/widgets/`     | 여러 feature/entity를 묶은 **큰 UI 블록**                                   | `demoDashboard`, `boardNav`                               |
-| `src/features/`    | **사용자가 하는 동작 하나**. UI + 그 동작에 필요한 상태·API 호출을 묶음     | `demoForm`(폼 제출), `apiPlayground`(엔드포인트 테스트)   |
-| `src/entities/`    | **앱이 다루는 핵심 데이터 단위**. 타입·모델만 가짐. feature에서 조립해서 씀 | `notice`(공지 타입), `qna`(QnA 타입)                      |
-| `src/shared/`      | 도메인 없는 앱 전용 유틸                                                    | `shared/config/routes.ts`                                 |
-| `packages/*`       | 멀티앱·인프라급 공통 (FSD shared)                                           | `@repo/ui`, `@repo/api-client`, `@repo/query`             |
+### 4계층 구조
 
-> **왜 `screens`인가?** Next.js는 `src/pages/`를 Pages Router로 인식합니다. FSD의 pages 레이어 이름은 `screens`로 둡니다.
+모든 ??코드(`src/`)??4개의 계층?�로�??�뉩?�다.  
+처음?�는 "?�디???�일??만들?�야 ?��??" ?????�래 ?��? 참고?�세??
 
-### Slice 안 segment (폴더 역할)
+| 계층 | ?�더 | ??�??�명 | ?�시 |
+| --- | --- | --- | --- |
+| 1 | `src/app/` | ???�작 ????번만 ?�팅?�는 �?| `AppProviders`, ?�더, ?�이?�바 |
+| 2 | `src/views/` | ?�정 URL??보이???�면 | `NoticePage`, `QnaPage` |
+| 3 | `src/features/` | ?�용?��? ?�는 ?�동 ?�나 | 공�??�항 검?? Q&A ?�성 |
+| 4 | `src/shared/` | ?�디?�나 ?�는 공통 ?�정/?�틸 | `routes.ts` |
 
-기능/엔티티 폴더(slice) 안에서는 **파일 종류**별로 segment를 둡니다.
-
-| segment  | 넣는 것                    | 예시                                                                 |
-| -------- | -------------------------- | -------------------------------------------------------------------- |
-| `ui/`    | React 컴포넌트             | `features/demoForm/ui/DemoFormPanel.tsx`                             |
-| `model/` | hook, store, 비즈니스 상태 | `entities/notice/model/types.ts`, (추가 시) `useNoticeList.ts`       |
-| `api/`   | API 호출·Orval 래핑        | (추가 시) `features/noticeList/api/getNotices.ts`                    |
-| `lib/`   | slice **내부만** 쓰는 헬퍼 | slice 전용 포맷터 등                                                 |
-
-외부에서는 slice의 **`index.ts`(public API)** 만 import 합니다.
-
-```ts
-// ✅
-import { DemoFormPanel } from "@/features/demoForm";
-
-// ❌ segment·내부 파일 직접 import
-import { DemoFormPanel } from "@/features/demoForm/ui/DemoFormPanel";
-```
-
-### Import 허용 표
-
-| from ↓ / to → | screens | widgets | features | entities | shared          | packages |
-| ------------- | ------- | ------- | -------- | -------- | --------------- | -------- |
-| **screens**   | —       | ✅      | ✅       | ✅       | ✅              | ✅       |
-| **widgets**   | ❌      | —       | ✅       | ✅       | ✅              | ✅       |
-| **features**  | ❌      | ❌      | —        | ✅       | ✅              | ✅       |
-| **entities**  | ❌      | ❌      | ❌       | —        | ✅              | ✅       |
-| **shared**    | ❌      | ❌      | ❌       | ❌       | slice 간 최소화 | ✅       |
-
-- `features/auth` → `features/cart` ❌ (필요하면 `widgets` 또는 `screens`에서 조합)
-- 도메인 hook·API는 `shared`가 아니라 **해당 feature/entity의 `model/`·`api/`**
-
-> **features vs entities 구분법**
->
-> - `entities` = **"무엇(What)"** — 데이터가 어떻게 생겼는가 (User, Notice의 타입·모델)
-> - `features` = **"어떻게(How)"** — 사용자가 그 데이터로 무엇을 하는가 (로그인, 글쓰기, 검색)
-
-### Custom Hook 위치 기준 (CRUD별)
-
-hook은 **읽기냐 / 쓰기냐**에 따라 위치가 달라집니다.
-
-| 동작               | 성격                                        | 위치                     |
-| ------------------ | ------------------------------------------- | ------------------------ |
-| `GET` 조회         | 데이터를 읽기만 함 — 여러 레이어에서 재사용 | `entities/{name}/model/` |
-| `POST` 등록        | 사용자가 행동을 일으킴                      | `features/{name}/model/` |
-| `PUT / PATCH` 수정 | 사용자가 행동을 일으킴                      | `features/{name}/model/` |
-| `DELETE` 삭제      | 사용자가 행동을 일으킴                      | `features/{name}/model/` |
-
-```
-entities/
-  notice/
-    model/
-      useNoticeList.ts    ← GET 목록 조회 ✅
-      useNoticeDetail.ts  ← GET 상세 조회 ✅
-
-features/
-  noticeCreate/
-    model/
-      useNoticeCreate.ts  ← POST 등록 ✅
-  noticeEdit/
-    model/
-      useNoticeEdit.ts    ← PUT 수정 ✅
-  noticeDelete/
-    model/
-      useNoticeDelete.ts  ← DELETE 삭제 ✅
-```
-
-> **조회 hook을 entities에 두는 이유:** screens, widgets, features 어디서든 공통으로 재사용되기 때문입니다.  
-> **등록·수정·삭제 hook을 features에 두는 이유:** 특정 사용자 행동(폼 제출, 버튼 클릭)에 종속되어 해당 feature 안에서만 쓰이기 때문입니다.
-
-### Path alias (`tsconfig.json`)
-
-| alias           | 경로              |
-| --------------- | ----------------- |
-| `@/screens/*`   | `src/screens/*`   |
-| `@/widgets/*`   | `src/widgets/*`   |
-| `@/features/*`  | `src/features/*`  |
-| `@/entities/*`  | `src/entities/*`  |
-| `@/shared/*`    | `src/shared/*`    |
-| `@/application` | `src/application` |
+> **규칙:** ??계층?� ?�래 계층??가?�다 ?????��?�? ?�래가 ?��? 가?�다 ?�면 ???�니??  
+> ?? `pages`??`features`�?import ?????��?�? `features`가 `pages`�?import ?�면 ???�니??
 
 ---
 
-## 예제: 지금 코드가 어떻게 연결되는지
+## ?�전 ?�토리얼 ?????�이지 만들�?
+> "FAQ 목록 ?�이지"�?처음부??직접 만들??봅니??  
+> ???�서�??�워?�면 ?�떤 ?�이지???�일?�게 만들 ???�습?�다.
 
-### 1) Next 라우트 → screen (얇은 진입점)
-
-```tsx
-// app/page.tsx
-export { HomePage as default } from "@/screens/home";
-
-// app/(board)/notice/page.tsx
-export { NoticePage as default } from "@/screens/notice";
-```
-
-### 2) screen — 위젯·타이포만 조립
-
-```tsx
-// src/screens/home/ui/HomePage.tsx
-import { Typography } from "@repo/ui";
-import { DemoDashboard } from "@/widgets/demoDashboard";
-
-export function HomePage() {
-  return (
-    <main>
-      <Typography variant="h4">Next.js 16.1 Monorepo</Typography>
-      <DemoDashboard />
-    </main>
-  );
-}
-```
-
-### 3) widget — feature 여러 개 + UI 패키지
-
-```tsx
-// src/widgets/demoDashboard/ui/DemoDashboard.tsx
-import { PublicEndpointPanel } from "@/features/apiPlayground";
-import { DemoFormPanel } from "@/features/demoForm";
-// + @repo/ui (Tabs, QCELL, Chart)
-```
-
-### 4) feature — 유스케이스 한 덩어리
-
-```tsx
-// src/features/apiPlayground/ui/PublicEndpointPanel.tsx
-import { usePublicEndpoint } from "@repo/api-client";
-import { Button } from "@repo/ui";
-```
-
-### 5) entity — 도메인 타입·표시 (API 연동 전 스켈레톤)
-
-```ts
-// src/entities/notice/model/types.ts
-export type Notice = { id: string; title: string; createdAt: string };
-
-// src/entities/notice/index.ts
-export type { Notice } from "./model/types";
-```
-
-### 6) shared — 라우트 상수 등 앱 전용
-
-```ts
-// src/shared/config/routes.ts
-export const routes = { home: "/", notice: "/notice", qna: "/qna" } as const;
-
-// src/widgets/board-nav/ui/board-nav.tsx
-import { routes } from "@/shared/config/routes";
-```
-
-### 7) 공통 hook을 추가할 때
-
-도메인 이름이 없는 hook만 `src/shared/lib/` (또는 `shared/lib/hooks/`)에 둡니다.
+### ?�체 구조 미리보기
 
 ```
-src/shared/lib/
-  use-debounce.ts
+만들 ?�일 목록
+?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
+src/features/faqList/
+  model/types.ts          ??FAQ ?�??(?�이??모양)
+  model/useFaqList.ts     ??FAQ 목록 가?�오????  ui/FaqListPanel.tsx     ??FAQ 목록??보여주는 컴포?�트
+  index.ts                ???��???공개??것만 모아?�는 ?�일
+
+src/views/faq/
+  ui/FaqPage.tsx          ??FaqListPanel??배치?�는 ?�이지
   index.ts
-```
 
-공지 목록 조회 hook은 `entities/notice/model/use-notice-list.ts`처럼 **entity/feature** 쪽에 둡니다.
+app/(main)/(board)/faq/
+  page.tsx                ??Next.js ?�우???�결
+
+src/shared/config/
+  routes.ts               ????�� ?�록 (기존 ?�일 ?�정)
+?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
+```
 
 ---
 
-## 실전 샘플: "공지사항" 기능을 처음부터 만든다면
+### Step 1 ??feature 만들�?
+**feature = ?�용?��? ?�는 ?�동 ?�나.** "FAQ 목록??본다" 가 ?�나??feature?�니??
 
-> 하나의 도메인을 레이어별로 어떻게 나누는지 전체 흐름을 보여줍니다.
-
-### 폴더 구조 전체
-
-```
-src/
-├── entities/
-│   └── notice/
-│       ├── model/
-│       │   ├── types.ts              # Notice 타입 정의
-│       │   ├── useNoticeList.ts      # GET 목록 조회 hook
-│       │   └── useNoticeDetail.ts    # GET 상세 조회 hook
-│       ├── ui/
-│       │   └── NoticeCard.tsx        # 공지 1건을 표시하는 기본 카드 UI
-│       └── index.ts                  # 외부 공개 API
-│
-├── features/
-│   ├── noticeCreate/
-│   │   ├── model/
-│   │   │   ├── schema.ts             # zod 유효성 검사 스키마
-│   │   │   └── useNoticeCreate.ts    # POST 등록 hook
-│   │   ├── ui/
-│   │   │   └── NoticeCreateForm.tsx
-│   │   └── index.ts
-│   ├── noticeEdit/
-│   │   ├── model/
-│   │   │   └── useNoticeEdit.ts      # PUT 수정 hook
-│   │   ├── ui/
-│   │   │   └── NoticeEditForm.tsx
-│   │   └── index.ts
-│   └── noticeDelete/
-│       ├── model/
-│       │   └── useNoticeDelete.ts    # DELETE 삭제 hook
-│       ├── ui/
-│       │   └── NoticeDeleteButton.tsx
-│       └── index.ts
-│
-├── widgets/
-│   └── noticeBoard/
-│       ├── ui/
-│       │   └── NoticeBoard.tsx       # 목록 + 페이지네이션 조합 블록
-│       └── index.ts
-│
-└── screens/
-    └── notice/
-        ├── ui/
-        │   └── NoticePage.tsx        # 화면 조립만 담당
-        └── index.ts
-```
-
-### 각 파일이 담는 내용
-
-**① 타입 정의** `entities/notice/model/types.ts`
+**`src/features/faqList/model/types.ts`** ???�이???�???�의
 
 ```ts
-export type Notice = {
+// FAQ ??건의 모양???�의?�니??
+export type Faq = {
   id: string;
-  title: string;
-  content: string;
-  createdAt: string;
+  question: string;
+  answer: string;
 };
 ```
 
-**② 조회 hook** `entities/notice/model/useNoticeList.ts`
+**`src/features/faqList/model/useFaqList.ts`** ???�이??로직 (??
 
 ```ts
-import { useQuery } from "@tanstack/react-query";
+"use client";
 
-export function useNoticeList() {
-  return useQuery({
-    queryKey: ["notice", "list"],
-    queryFn: () => fetchNotices(), // @repo/api-client 호출
-  });
+import { useState } from "react";
+import type { Faq } from "./types";
+
+// ?�제 ?�로?�트?�서??API ?�출�??�체합?�다.
+const SAMPLE: Faq[] = [
+  { id: "1", question: "?�원가?��? ?�떻�??�나??", answer: "?�단 메뉴?�서 가??버튼???�르?�요." },
+  { id: "2", question: "비�?번호�??�었?�요.", answer: "로그???�면??비�?번호 찾기�??�용?�세??" },
+];
+
+export function useFaqList() {
+  const [faqs] = useState<Faq[]>(SAMPLE);
+  return { faqs };
 }
 ```
 
-**③ 유효성 검사 스키마** `features/noticeCreate/model/schema.ts`
-
-```ts
-import { z } from "zod";
-
-export const noticeSchema = z.object({
-  title: z.string().min(1, "제목을 입력해주세요"),
-  content: z.string().min(10, "내용은 10자 이상 입력해주세요"),
-});
-```
-
-**④ 등록 hook** `features/noticeCreate/model/useNoticeCreate.ts`
-
-```ts
-import { useMutation } from "@tanstack/react-query";
-
-export function useNoticeCreate() {
-  return useMutation({
-    mutationFn: (data: NoticeCreateInput) => createNotice(data),
-  });
-}
-```
-
-**⑤ 화면 조립** `screens/notice/ui/NoticePage.tsx`
+**`src/features/faqList/ui/FaqListPanel.tsx`** ??UI 컴포?�트
 
 ```tsx
-import { NoticeBoard } from "@/widgets/noticeBoard";
-import { NoticeCreateForm } from "@/features/noticeCreate";
+"use client";
 
-export function NoticePage() {
+import { useFaqList } from "../model/useFaqList";
+
+export function FaqListPanel() {
+  const { faqs } = useFaqList();
+
   return (
-    <main>
-      <NoticeCreateForm />
-      <NoticeBoard />
+    <ul style={{ padding: 0, listStyle: "none" }}>
+      {faqs.map((faq) => (
+        <li key={faq.id} style={{ marginBottom: "1rem", borderBottom: "1px solid #eee" }}>
+          <strong>Q. {faq.question}</strong>
+          <p style={{ marginTop: "0.25rem", color: "#555" }}>A. {faq.answer}</p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**`src/features/faqList/index.ts`** ???��? 공개 API
+
+```ts
+// ???�일???�힌 것만 ?��??�서 import ?????�습?�다.
+export { FaqListPanel } from "./ui/FaqListPanel";
+export { useFaqList } from "./model/useFaqList";
+```
+
+> **??index.ts가 ?�요?��???**  
+> ?��? ?�일 경로가 바뀌어???��? import 경로??그�?�??��??�어, ?�정 범위가 줄어??��??
+
+---
+
+### Step 2 ??page 만들�?
+**page = feature?�을 모아 ?�면 ?�나�??�성?�는 �?**
+
+**`src/views/faq/ui/FaqPage.tsx`**
+
+```tsx
+"use client";
+
+import { Typography } from "@repo/ui";
+import { FaqListPanel } from "@/features/faqList"; // ??index.ts�??�해 import
+
+export function FaqPage() {
+  return (
+    <main style={{ padding: "2rem" }}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
+        ?�주 묻는 질문
+      </Typography>
+      <FaqListPanel />
     </main>
   );
 }
 ```
 
-### segment 정리
-
-| segment           | 무엇을 넣나          | 주의                                      |
-| ----------------- | -------------------- | ----------------------------------------- |
-| `model/types.ts`  | 타입·인터페이스      | 로직 없음, 순수 타입만                    |
-| `model/use*.ts`   | custom hook          | 조회→entities, 쓰기→features              |
-| `model/schema.ts` | zod 등 유효성 스키마 | 해당 feature 안에서만 사용                |
-| `ui/*.tsx`        | React 컴포넌트       | 외부에서 index.ts 통해서만 import         |
-| `api/*.ts`        | API 호출 함수        | Orval 생성 함수 래핑                      |
-| `lib/*.ts`        | slice 내부 전용 유틸 | 외부에서 import 금지                      |
-| `index.ts`        | 외부 공개 API        | 여기서만 export, 내부 파일 직접 접근 금지 |
-
----
-
-## Zod — 런타임 스키마 검증
-
-> 참조: [https://zod.dev/](https://zod.dev/)
-
-### 개요
-
-Zod는 TypeScript-first 스키마 선언 및 런타임 검증 라이브러리입니다.  
-TypeScript 타입은 컴파일 타임에만 동작하지만, Zod 스키마는 **런타임에서도 실제 데이터를 검증**합니다.
-
-```
-TypeScript 타입  →  컴파일 타임 안전성
-Zod 스키마      →  런타임 안전성 + 타입 자동 추론
-```
-
-### 설치 위치
-
-이 모노레포에서 `zod`는 `@repo/types` 패키지에서 관리합니다.  
-루트 앱과 다른 패키지는 `zod`를 직접 의존하지 않고 `@repo/types`를 통해 사용합니다.
+**`src/views/faq/index.ts`**
 
 ```ts
-// ✅ 권장 — @repo/types를 통해 사용
-import { z } from "@repo/types";
-
-// ❌ 비권장 — 직접 참조 시 버전 분산 위험
-import { z } from "zod";
-```
-
-### 주요 사용처
-
-#### 1. 조회 — API 응답 런타임 검증
-
-Orval이 생성한 타입은 컴파일 타임 전용입니다.  
-실제 API 응답이 스키마와 다를 경우를 대비해 `safeParse`로 런타임 검증을 추가할 수 있습니다.
-
-```ts
-import { z } from "@repo/types";
-
-const UserSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  email: z.string().email(),
-  role: z.enum(["Admin", "Editor", "Viewer"]),
-  active: z.boolean(),
-});
-
-// safeParse: 실패해도 예외를 던지지 않음
-const result = UserSchema.safeParse(apiResponse);
-
-if (result.success) {
-  console.log(result.data); // 타입 안전한 데이터
-} else {
-  console.error(result.error.issues); // 오류 상세 목록
-}
-```
-
-#### 2. 등록/수정 — 폼 유효성 검사
-
-`react-hook-form`의 `zodResolver`와 조합하면 스키마 하나로 **타입 추론 + 폼 검증**을 동시에 처리합니다.
-
-```ts
-import { z } from "@repo/types";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-const UserFormSchema = z.object({
-  name: z.string().min(1, "이름을 입력해주세요.").max(20),
-  email: z.string().email("올바른 이메일 형식이 아닙니다."),
-  role: z.enum(["Admin", "Editor", "Viewer"]),
-});
-
-type UserFormValues = z.infer<typeof UserFormSchema>; // 타입 자동 추론
-
-const {
-  register,
-  handleSubmit,
-  formState: { errors },
-} = useForm<UserFormValues>({
-  resolver: zodResolver(UserFormSchema),
-});
-```
-
-### 스키마 관리 원칙
-
-- 공통으로 재사용되는 스키마는 `@repo/types/src/schemas/` 하위에 도메인별 파일로 관리합니다.
-- 특정 feature에서만 사용하는 스키마는 해당 feature 내부 파일에서 정의합니다.
-- `z.infer<typeof Schema>`로 타입을 추론해 별도 `type` 선언을 최소화합니다.
-
-```
-packages/types/src/schemas/
-├── common.ts     ← 페이지네이션 등 공통 스키마
-└── {domain}.ts   ← 도메인별 스키마 추가
+export { FaqPage } from "./ui/FaqPage";
 ```
 
 ---
 
-## Zustand — 클라이언트 상태 관리
+### Step 3 ??Next.js ?�우???�결
 
-> 참조: [https://zustand.docs.pmnd.rs/](https://zustand.docs.pmnd.rs/learn/getting-started/introduction)
+**`app/(main)/(board)/faq/page.tsx`** ?�일???�로 만듭?�다.
 
-### 개요
-
-Zustand는 경량 전역 상태 관리 라이브러리입니다.  
-Redux처럼 보일러플레이트가 많지 않고, Context처럼 불필요한 리렌더링이 발생하지 않습니다.
-
-```
-useState / useReducer  →  컴포넌트 로컬 상태
-React Context          →  리렌더링 범위 조절이 어렵고 성능 최적화 복잡
-Zustand                →  전역 상태, selector로 필요한 값만 구독 → 리렌더링 최소화
+```tsx
+// ???�일?� ????줄입?�다. Next.js?�게 "??URL?�서 FaqPage�?보여�? ?�고 ?�려줍니??
+export { FaqPage as default } from "@/pages/faq";
 ```
 
-### 두 가지 패턴 비교
-
-| 구분          | Volatile (일반 스토어)             | Persistent (persist 미들웨어) |
-| ------------- | ---------------------------------- | ----------------------------- |
-| 저장 위치     | 브라우저 메모리                    | `localStorage`                |
-| 새로고침 후   | 초기값으로 리셋                    | 마지막 값 그대로 복원         |
-| 적합한 데이터 | UI 상태, 임시 필터, 모달 개폐 여부 | 사용자 설정, 테마, 언어 등    |
+> **???�렇�?짧나??**  
+> ?�제 ?�면 코드??`src/views/faq/`???�습?�다.  
+> `app/` ?�더??URL 경로�?결정?�는 ??��?�라, 최�????�게 ?��??�니??
 
 ---
 
-### 패턴 1 — Volatile Store (리로드 시 초기화)
+### Step 4 ????�� ?�록
 
-페이지를 새로고침하면 초기값으로 돌아가는 일반 스토어입니다.
+**`src/shared/config/routes.ts`** ?�일???�어 ??곳을 ?�정?�니??
 
-**스토어 정의** `src/features/zustandDemo/model/volatileStore.ts`
+```ts
+// ??routes ?�수??경로 추�?
+export const routes = {
+  home: "/",
+  notice: "/notice",
+  qna: "/qna",
+  faq: "/faq",    // ??추�?
+} as const;
+
+// ??TAB_ROUTES?????�정 추�?
+export const TAB_ROUTES: Record<string, TabRouteConfig> = {
+  // ... 기존 ??�� ...
+  [routes.faq]: {
+    title: "FAQ",
+    loader: () => import("@/pages/faq").then((m) => ({ default: m.FaqPage })),
+  },
+};
+```
+
+> **??routes.ts ?�만 추�??�면 ?�나??**  
+> `app/(main)/layout.tsx`가 `TAB_ROUTES`�??�어 ??�� ?�동?�로 ?�성?�니??  
+> layout.tsx ??건드�??�요가 ?�습?�다.
+
+---
+
+### Step 5 ???�이?�바 메뉴 추�? (?�택)
+
+?�이?�바?�도 메뉴가 보이�??�한?�면 `src/app/layout/appSidebar/ui/AppSidebar.tsx` �??�정?�니??
+
+```ts
+const menuItems = [
+  { label: "??, href: routes.home },
+  { label: "공�??�항", href: routes.notice },
+  { label: "Q&A", href: routes.qna },
+  { label: "FAQ", href: routes.faq }, // ??추�?
+];
+```
+
+---
+
+### ?�성 ?�인
+
+`pnpm dev` ?�행 ??브라?��??�서 `/faq` �??�동?�면 FAQ ??�� ?�립?�다.
+
+---
+
+## ?�주 ?�는 ?�수 / FAQ
+
+### Q. feature ?��? ?�일??직접 import ?�더??경고가 ?�요.
+
+```ts
+// ???��????��? 구조가 바뀌면 ??경로??같이 바꿔???�니??
+import { FaqListPanel } from "@/features/faqList/ui/FaqListPanel";
+
+// ???�바�???index.ts �??�해 ?�근
+import { FaqListPanel } from "@/features/faqList";
+```
+
+### Q. ???�이지�?만들?�는????�� ???�려??
+
+`src/shared/config/routes.ts` ??`TAB_ROUTES` ????��??추�??�는지 ?�인?�세??  
+`app/` ?�더??`page.tsx`�?만들�?URL?� ?�작?��?�? ??��로는 ?�리지 ?�습?�다.
+
+### Q. feature ?�더?�만 만들�?pages ?�더???�략?�도 ?�나??
+
+???�니?? `features/` ??기능(로직 + UI 조각)?�고 `pages/` ???�면(?�체 배치)?�니??  
+feature가 직접 ?�우?�에 ?�결?�면 ?�중??같�? feature�????�면?�서 ?�사?�할 ??문제가 ?�깁?�다.
+
+### Q. @/ �??�작?�는 경로가 ?�디?��? 모르겠어??
+
+`tsconfig.json` ??`paths` ?�정???�인?�세??
+
+| import 경로 | ?�제 ?�일 ?�치 |
+| --- | --- |
+| `@/app/...` | `src/app/...` |
+| `@/views/...` | `src/views/...` |
+| `@/features/...` | `src/features/...` |
+| `@/shared/...` | `src/shared/...` |
+| `@repo/ui` | `packages/ui` |
+
+### Q. "use client"�??�제 붙이?�요?
+
+Next.js?�서 `useState`, `useEffect` 같�? ?�을 ?�용?�는 ?�일?�는 �??�에 `"use client"`가 ?�요?�니??  
+?�???�의(`types.ts`)???�수 ?�일처럼 브라?��? API�??��? ?�는 ?�일?�는 붙이지 ?�아???�니??
+
+```ts
+// types.ts ???�?�만 ?�으므�?"use client" 불필??export type Faq = { id: string; question: string; answer: string };
+```
+
+```tsx
+// FaqListPanel.tsx ??useState ?�용 ??"use client" ?�요
+"use client";
+
+import { useState } from "react";
+```
+
+---
+
+## ?�더 구조 (?�체)
+
+```
+next-tanstack-monorepo/
+?��??� apps/
+??  ?��??� web/                        # Web ??(localhost:3000)
+??  ??  ?��??� app/                    # Next.js App Router ?�우??진입????  ??  ??  ?��??� layout.tsx          # 루트 ?�이?�웃
+??  ??  ??  ?��??� (main)/page.tsx     # / ??????  ??  ??  ?��??� (main)/(board)/
+??  ??  ??      ?��??� notice/page.tsx # /notice ??공�??�항
+??  ??  ??      ?��??� qna/page.tsx    # /qna ??Q&A
+??  ??  ?��??� src/
+??  ??  ??  ?��??� app/                # ???�역 ?�정 (Provider, ?�더, ?�이?�바)
+??  ??  ??  ?��??� views/              # ?�면 조립 (view ?�위)
+??  ??  ??  ??  ?��??� home/
+??  ??  ??  ??  ?��??� notice/
+??  ??  ??  ??  ?��??� qna/
+??  ??  ??  ?��??� features/           # 기능 ?�위 (로직 + UI 조각)
+??  ??  ??  ?��??� shared/             # 공통 ?�정/?�틸
+??  ??  ?��??� .env.dev                 # 개발 환경 (커밋 가능)
+??  ??  ?��??� .env.prod                # 운영 환경 (커밋 가능)
+??  ??  ?��??� .env.local               # 로컬 오버라이드 (gitignore)
+??  ??  ?��??� next.config.ts
+??  ?��??� admin/                      # Admin ?�플 ??(localhost:3100)
+??      ?��??� app/
+??      ??  ?��??� layout.tsx
+??      ??  ?��??� page.tsx
+??      ?��??� src/app/providers/
+??      ?��??� .env.dev
+??      ?��??� .env.prod
+??      ?��??� .env.local
+??      ?��??� next.config.ts
+?��??� packages/                       # 공통 ?�프???�키지
+??  ?��??� env/                        # ?�별 ?�경변??Zod 검�???  ?��??� ui/                         # 버튼, ?? ?�이?�웃 ??공통 UI
+??  ?��??� api-client/                 # Axios + Orval ?�성 API
+??  ?��??� query/                      # TanStack Query Provider
+??  ?��??� types/                      # Zod + 공통 ?�???�키�???  ?��??� config-typescript/          # 공통 TS ?�정
+?��??� .env.dev                        # 루트 공통 (개발)
+?��??� .env.prod                       # 루트 공통 (운영)
+?��??� .env.example                    # ?�체 변??계약 문서
+?��??� pnpm-workspace.yaml
+?��??� turbo.json
+```
+
+---
+
+## 명명 규칙
+
+> ?�일/?�더 ?�름??짓는 규칙?�니?? ?� ?�체가 ?�일?�게 맞춰???�동?�성�?검?�이 ?�합?�다.
+
+| ?�??| 규칙 | ?�시 |
+| ---- | ---- | ---- |
+| **?�더** | camelCase (?�문???�작) | `qnaCreate/`, `faqList/` |
+| **React 컴포?�트 ?�일** | PascalCase (?�문자 ?�작) | `FaqListPanel.tsx`, `AppHeader.tsx` |
+| **???�일** | camelCase, `use` ?�두???�수 | `useFaqList.ts`, `useTabState.ts` |
+| **?�???�정/?�틸 ?�일** | camelCase | `types.ts`, `routes.ts` |
+| **배럴 ?�일** | ??�� `index.ts` | `index.ts` |
+
+> **배럴 ?�일(barrel file)?��??**  
+> `index.ts`처럼 ?�러 ?�일??export�???곳에 모아?�는 ?�일?�니??  
+> ?��??�서?????�일 ?�나�?보고 "??feature?�서 �??????�는지" ?�악?�니??
+
+```
+src/features/
+?��??� faqList/                    ???�더: camelCase
+    ?��??� model/
+    ??  ?��??� useFaqList.ts       ???? camelCase
+    ?��??� ui/
+    ??  ?��??� FaqListPanel.tsx    ??컴포?�트: PascalCase
+    ?��??� index.ts                ??배럴: ??�� index.ts
+```
+
+> **???�더???�이??`faq-list`) ?�??camelCase(`faqList`)?��???**  
+> ?�이?�이 ?�으�??��? ?�구?�서 ?�옴??처리가 ?�요??import 경로가 지?�분해집니??  
+> camelCase??JavaScript ?�별?�로 바로 ?????�어 깔끔?�니??
+
+---
+
+## ??기능 ?�을 ??체크리스??
+기능??추�?????"?�디??만들?�야 ?��??" 가 ?�갈리면 ?�래 질문???�서?��??�라가?�요.
+
+| 질문 | 만들 �?|
+| --- | --- |
+| ??URL ?�면?��?? | `app/.../page.tsx` (?�우?? + `src/views/<name>/` (?�면) |
+| ?�용???�동 ?�나?��?? (검?? ?�성, ??�� ?? | `src/features/<name>/` |
+| �?기능?�서�??�는 ?�?�인가? | `src/features/<name>/model/types.ts` |
+| ?�러 feature?�서 공통?�로 ?�는 ?�틸?��?? | `src/shared/lib/<name>.ts` |
+| 버튼·Input ??범용 UI?��?? | `@repo/ui` (packages/ui) |
+| API ?�출 코드?��?? | `@repo/api-client` |
+
+**?�제 ?�시: 공�??�항 검??기능**
+
+```
+src/features/noticeSearch/
+?��??� model/
+??  ?��??� types.ts          ??Notice ?�????  ?��??� useNoticeSearch.ts ??검?????��??� ui/
+??  ?��??� NoticeSearchPanel.tsx ??검??UI
+?��??� index.ts
+
+src/views/notice/
+?��??� ui/
+    ?��??� NoticePage.tsx    ??NoticeSearchPanel 배치
+```
+
+---
+
+## Zustand ???�라?�언???�태 관�?
+> 참조: [https://zustand.docs.pmnd.rs/](https://zustand.docs.pmnd.rs/)
+
+### ?�제 Zustand�??�나??
+
+| ?�황 | ?�용??�?|
+| --- | --- |
+| 컴포?�트 ?�나?�서�??�는 ?�태 (ex: 모달 ?�림/?�힘) | `useState` |
+| ?�러 컴포?�트?�서 공유?�는 ?�태 (ex: 로그???�용???�보) | `Zustand` |
+| ?�버?�서 받아?�는 ?�이??(ex: 공�??�항 목록) | `TanStack Query` |
+
+### Volatile vs Persistent 차이
+
+| 구분 | Volatile (?�반 ?�토?? | Persistent (localStorage ?�?? |
+| --- | --- | --- |
+| ?�???�치 | 브라?��? 메모�?| `localStorage` |
+| ?�로고침 ??| 초기값으�?리셋 | 마�?�?�?그�?�?복원 |
+| ?�제 ?�나?? | ?�시 UI ?�태, 모달 개폐 ?��? | ?�용???�정, ?�마, ?�어 |
+
+---
+
+### ?�턴 1 ??Volatile Store (?�로고침?�면 초기??
+
+**?�토???�의** `src/features/zustandDemo/model/volatileStore.ts`
 
 ```ts
 import { create } from "zustand";
 
 interface VolatileState {
   count: number;
-  message: string;
   increment: () => void;
   decrement: () => void;
   reset: () => void;
-  setMessage: (msg: string) => void;
 }
 
 export const useVolatileStore = create<VolatileState>((set) => ({
   count: 0,
-  message: "",
   increment: () => set((s) => ({ count: s.count + 1 })),
   decrement: () => set((s) => ({ count: s.count - 1 })),
-  reset: () => set({ count: 0, message: "" }),
-  setMessage: (msg) => set({ message: msg }),
+  reset: () => set({ count: 0 }),
 }));
 ```
 
-**컴포넌트에서 사용**
+**컴포?�트?�서 ?�용**
 
 ```tsx
 "use client";
 
 import { useVolatileStore } from "../model/volatileStore";
 
-export function VolatilePanel() {
-  // selector로 필요한 값만 구독 → 해당 값이 변경될 때만 리렌더링
+export function CounterPanel() {
+  // selector: ?�요??값만 꺼내??구독?�니??
+  // count가 바�??�만 ??컴포?�트가 리렌?�링?�니??
   const count = useVolatileStore((s) => s.count);
   const increment = useVolatileStore((s) => s.increment);
 
   return (
     <div>
-      <p>카운트: {count}</p>
-      <button onClick={increment}>증가</button>
+      <p>카운?? {count}</p>
+      <button onClick={increment}>증�?</button>
     </div>
   );
 }
 ```
 
-> 페이지를 새로고침하면 `count`가 0으로, `message`가 `""`로 초기화됩니다.
+> **selector?�?**  
+> `(s) => s.count` 처럼 ?�토?�에???�요??값만 골라?�는 ?�수?�니??  
+> ?�토???�체�?구독?�면 관계없??값이 바�??�도 리렌?�링??발생?�니??
+>
+> ```ts
+> // ??비권?????�토???�체�?가?�오�?count?� 무�???변경에??리렌?�링
+> const store = useVolatileStore();
+>
+> // ??권장 ??count가 바�??�만 리렌?�링
+> const count = useVolatileStore((s) => s.count);
+> ```
 
 ---
 
-### 패턴 2 — Persistent Store (리로드 후 유지)
-
-`persist` 미들웨어를 사용해 상태를 `localStorage`에 자동으로 직렬화·역직렬화합니다.
-
-**스토어 정의** `src/features/zustandDemo/model/persistentStore.ts`
+### ?�턴 2 ??Persistent Store (?�로고침?�도 ?��?)
 
 ```ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface PersistentState {
-  count: number;
-  message: string;
-  increment: () => void;
-  decrement: () => void;
-  reset: () => void;
-  setMessage: (msg: string) => void;
-}
-
-export const usePersistentStore = create<PersistentState>()(
+export const usePersistentStore = create<VolatileState>()(
   persist(
     (set) => ({
       count: 0,
-      message: "",
       increment: () => set((s) => ({ count: s.count + 1 })),
       decrement: () => set((s) => ({ count: s.count - 1 })),
-      reset: () => set({ count: 0, message: "" }),
-      setMessage: (msg) => set({ message: msg }),
+      reset: () => set({ count: 0 }),
     }),
-    { name: "zustand-demo-persistent" } // localStorage 키 이름
-  )
+    { name: "my-store-key" }, // localStorage???�?�될 ???�름
+  ),
 );
 ```
 
-**컴포넌트에서 사용**
+> 브라?��? DevTools ??Application ??Local Storage ?�서 ?�?�된 값을 직접 ?�인?????�습?�다.
 
-```tsx
-"use client";
+### ?�일 ?�치 기�?
 
-import { usePersistentStore } from "../model/persistentStore";
+| 범위 | ?�치 |
+| --- | --- |
+| ?�정 feature?�서�??�는 ?�토??| `src/features/{name}/model/use{Name}Store.ts` |
+| ?�러 feature?�서 공유?�는 ?�역 ?�토??| `src/shared/model/use{Name}Store.ts` |
 
-export function PersistentPanel() {
-  const count = usePersistentStore((s) => s.count);
-  const increment = usePersistentStore((s) => s.increment);
+### ?�모 ?�인
 
-  return (
-    <div>
-      <p>카운트: {count}</p>
-      <button onClick={increment}>증가</button>
-    </div>
-  );
-}
-```
-
-> 페이지를 새로고침해도 마지막 `count`와 `message` 값이 그대로 유지됩니다.  
-> 브라우저 DevTools → Application → Local Storage → `zustand-demo-persistent` 키에서 저장된 JSON을 직접 확인할 수 있습니다.
-
----
-
-### persist 미들웨어 주요 옵션
-
-```ts
-persist(stateCreator, {
-  name: "my-store", // localStorage 키 이름 (필수)
-  storage: createJSONStorage(() => sessionStorage), // 기본값: localStorage
-  partialize: (state) => ({
-    // 저장할 필드만 선택 (나머지는 메모리에만 유지)
-    count: state.count,
-  }),
-  version: 1, // 스키마 버전 관리 (migrate 옵션과 함께 사용)
-});
-```
-
-### FSD 위치 기준
-
-| 범위                                  | 위치                                            |
-| ------------------------------------- | ----------------------------------------------- |
-| 특정 feature에서만 쓰는 스토어        | `src/features/{name}/model/use{Name}Store.ts` |
-| 여러 feature에서 공유하는 전역 스토어 | `src/shared/model/use{Name}Store.ts`          |
-
-외부에서는 항상 `index.ts`를 통해서만 접근합니다.
-
-```ts
-// ✅ 권장
-import { useVolatileStore } from "@/features/zustandDemo";
-
-// ❌ 내부 파일 직접 접근 금지
-import { useVolatileStore } from "@/features/zustandDemo/model/volatileStore";
-```
-
-### 데모 확인
-
-홈 화면 → **DemoDashboard** → **"Zustand 예제"** 탭에서 두 패턴을 직접 비교할 수 있습니다.
+???�면 ??DemoDashboard ??**"Zustand ?�제"** ??��?????�턴??직접 비교?????�습?�다.
 
 ```
 src/features/zustandDemo/
-├── index.ts
-├── model/
-│   ├── volatileStore.ts       ← create() 만 사용
-│   └── persistentStore.ts    ← persist() 미들웨어 적용
-└── ui/
-    ├── ZustandDemoPanel.tsx  ← 탭 컨테이너
-    ├── VolatilePanel.tsx      ← 리로드 시 초기화 예제
-    └── PersistentPanel.tsx   ← 리로드 후 유지 예제
+?��??� model/
+??  ?��??� volatileStore.ts      ???�반 ?�토????  ?��??� persistentStore.ts   ??localStorage ?�???��??� ui/
+    ?��??� ZustandDemoPanel.tsx
+    ?��??� VolatilePanel.tsx
+    ?��??� PersistentPanel.tsx
 ```
 
 ---
 
-## MDI 탭 시스템
+## Zod ???��????�키�?검�?
+> 참조: [https://zod.dev/](https://zod.dev/)
 
-> 관련 파일: `packages/ui/src/layout/mdi/`, `src/shared/config/routes.ts`, `app/(main)/layout.tsx`
+### TypeScript ?�?�과 Zod??차이
 
-화면 전환 없이 여러 페이지를 탭으로 열어두는 MDI(Multiple Document Interface) 시스템입니다.  
-탭 목록과 활성 탭은 `localStorage`에 자동 저장되어 **새로고침 후에도 복원**됩니다.
+```
+TypeScript ?�?? ?? 코드 ?�성 �?컴파???�???�만 체크?�니??
+Zod ?�키�?     ?? ?�이 ?�제�??�행?�는 ?�안(?��????�도 ?�이?��? 검증합?�다.
+```
 
-### 새 페이지를 탭으로 추가하는 방법
+TypeScript??"코드가 맞게 ?�성?�었??" �?검?�하�?  
+Zod??"?�버?�서 ?�제�?받�? ?�이?��? ?�상???�태?��??" �?검?�합?�다.
 
-`src/shared/config/routes.ts` 의 `TAB_ROUTES` 에만 항목을 추가하면 됩니다.  
-`app/(main)/layout.tsx` 는 수정하지 않아도 자동으로 반영됩니다.
+### import 방법
+
+???�로?�트?�서 `zod`??`@repo/types` �??�해 ?�용?�니??
 
 ```ts
-// src/shared/config/routes.ts
-export const TAB_ROUTES: Record<string, TabRouteConfig> = {
-  // 기존 항목들 ...
+// ??권장
+import { z } from "@repo/types";
 
-  "/settings": {
-    title: "설정",
-    loader: () =>
-      import("@/screens/settings").then((m) => ({ default: m.SettingsPage })),
+// ??비권??(직접 import ??버전 충돌 ?�험)
+import { z } from "zod";
+```
+
+### 주요 ?�용 방법
+
+#### safeParse vs parse
+
+| 메서??| 검�??�패 ??|
+| --- | --- |
+| `schema.parse(data)` | ?�외(?�러)�??�집?�다 |
+| `schema.safeParse(data)` | ?�외 ?�이 `{ success: false, error }` �?반환?�니??|
+
+```ts
+import { z } from "@repo/types";
+
+const NoticeSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  createdAt: z.string(),
+});
+
+// API ?�답 검�???safeParse???�패?�도 ?�이 ?��?지 ?�습?�다.
+const result = NoticeSchema.safeParse(apiResponse);
+
+if (result.success) {
+  console.log(result.data); // ?�?�이 보장???�이??} else {
+  console.error(result.error.issues); // ?�떤 ?�드가 문제?��? 목록
+}
+```
+
+#### ???�효??검??(react-hook-form + Zod)
+
+```ts
+import { z } from "@repo/types";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const FaqFormSchema = z.object({
+  question: z.string().min(5, "질문??5???�상 ?�력?�주?�요."),
+  answer: z.string().min(1, "?��????�력?�주?�요."),
+});
+
+// z.infer �??�?�을 ?�동 추론?�니?? 별도 type ?�언 불필??
+type FaqFormValues = z.infer<typeof FaqFormSchema>;
+
+const { register, handleSubmit, formState: { errors } } = useForm<FaqFormValues>({
+  resolver: zodResolver(FaqFormSchema),
+});
+```
+
+### ?�키�??�일 ?�치
+
+| 범위 | ?�치 |
+| --- | --- |
+| ?�정 feature?�서�??�는 ?�키�?| `src/features/{name}/model/schema.ts` |
+| ?�러 곳에??공통?�로 ?�는 ?�키�?| `packages/types/src/schemas/{name}.ts` |
+
+---
+
+## MDI ???�스??
+> 관???�일: `packages/ui/src/layout/mdi/`, `src/shared/config/routes.ts`, `app/(main)/layout.tsx`
+
+?�면 ?�환 ?�이 ?�러 ?�이지�???���??�어?�는 ?�스?�입?�다.  
+??목록�??�성 ??? `localStorage`???�동 ?�?�되???�로고침 ?�에??복원?�니??
+
+### ???�이지�???���?추�??�는 방법
+
+`src/shared/config/routes.ts` ??`TAB_ROUTES` ?�만 ??��??추�??�면 ?�니??  
+`app/(main)/layout.tsx` ???�정?��? ?�아???�동?�로 반영?�니??
+
+```ts
+export const TAB_ROUTES: Record<string, TabRouteConfig> = {
+  // 기존 ??��??...
+
+  "/faq": {
+    title: "FAQ",
+    loader: () => import("@/pages/faq").then((m) => ({ default: m.FaqPage })),
   },
 };
 ```
 
 ---
 
-### 탭 상태 저장 — `useTabState`
+### ???�태 ?�????`useTabState`
 
-탭 컴포넌트 내에서 `useState` 대신 `useTabState`를 사용하면  
-다른 탭으로 이동(언마운트)했다가 돌아와도 상태가 유지됩니다.  
-탭을 닫으면 해당 상태는 자동으로 삭제됩니다.
+#### useState?�??차이
 
-**단일 값 예제**
+| | `useState` | `useTabState` |
+| --- | --- | --- |
+| ?�른 ??���??�동(?�마?�트) ???�아?�면? | 초기값으�?리셋 | ?�전 �??��? |
+| ??�� ?�으�? | 컴포?�트 ?�제 | ?�?�된 ?�태???�동 ??�� |
+| ?�제 ?�나?? | ?�반?�인 UI ?�태 | ??�??�동???�는 ?�면???�력�?|
+
+**?�용 방법** ??`useState` ?� ?�일?�게 ?�니??
 
 ```tsx
 import { useTabState } from "@repo/ui/layout/mdi";
 
-function SettingsPage() {
-  // useState 처럼 사용 — 언마운트/리마운트 후에도 값 유지
-  const [darkMode, setDarkMode] = useTabState("/settings", false);
+function QnaPage() {
+  // useState("/qna", false) ?� 같�? 방식?�로 ?�용
+  // ??번째 ?�자가 초기값이�? �?번째 ?�자????ID(URL 경로)?�니??
+  const [draftOpen, setDraftOpen] = useTabState("/qna", false);
 
   return (
     <label>
       <input
         type="checkbox"
-        checked={darkMode}
-        onChange={(e) => setDarkMode(e.target.checked)}
+        checked={draftOpen}
+        onChange={(e) => setDraftOpen(e.target.checked)}
       />
-      다크 모드
-    </label>
+      ?�시 ?�성 ?�성??    </label>
   );
 }
 ```
 
-**여러 필드를 객체로 묶기 (권장)**
+**?�러 ?�드�?객체�?묶기 (권장)**
 
 ```tsx
-import { useTabState } from "@repo/ui/layout/mdi";
-
-interface SettingsForm {
-  theme: "light" | "dark";
-  language: string;
-  fontSize: number;
+interface QnaDraftForm {
+  category: string;
+  text: string;
 }
 
-const INITIAL: SettingsForm = { theme: "light", language: "ko", fontSize: 14 };
+const INITIAL: QnaDraftForm = { category: "", text: "" };
 
-function SettingsPage() {
-  const [form, setForm] = useTabState<SettingsForm>("/settings", INITIAL);
+function QnaPage() {
+  const [form, setForm] = useTabState<QnaDraftForm>("/qna", INITIAL);
 
-  // 함수형 업데이트로 일부 필드만 변경
-  const handleTheme = (theme: "light" | "dark") =>
-    setForm((prev) => ({ ...prev, theme }));
+  // ?��? ?�드�?바�? ?�는 ?�수???�데?�트�??�용?�니??
+  const handleCategory = (category: string) =>
+    setForm((prev) => ({ ...prev, category }));
 
   return (
-    <select value={form.theme} onChange={(e) => handleTheme(e.target.value as "light" | "dark")}>
-      <option value="light">라이트</option>
-      <option value="dark">다크</option>
+    <select value={form.category} onChange={(e) => handleCategory(e.target.value)}>
+      <option value="">카테고리 ?�택</option>
+      <option value="bug">버그 ?�보</option>
     </select>
   );
 }
@@ -886,73 +765,18 @@ function SettingsPage() {
 
 ---
 
-### 탭 닫기 전 콜백 — `useRegisterTabClose`
+### ???�기 ??콜백 ??`useRegisterTabClose`
 
-탭 컴포넌트 내에서 `useRegisterTabClose`를 사용하면  
-사용자가 탭을 닫기 전에 함수를 실행할 수 있습니다.
+?�용?��? ??�� ?�기 ?�에 "?�?�하지 ?��? ?�용???�습?�다" 같�? ?�인 창을 ?�울 ???�습?�다.
 
-| 반환값 | 동작 |
+| 반환�?| ?�작 |
 | --- | --- |
-| `false` | 닫기 취소 (탭 유지) |
-| `true` / `void` | 닫기 진행 |
-| `Promise<boolean>` | await 후 처리 (비동기 다이얼로그 등) |
+| `true` ?�는 반환�??�음 | ??�� ?�습?�다 |
+| `false` | ?�기�?취소?�니??(???��?) |
+| `Promise<boolean>` | 비동�??�이?�로�???처리 |
 
-> **주의:** 비활성 탭(언마운트 상태)을 닫을 때는 콜백이 실행되지 않습니다.  
-> 현재 활성(포커스된) 탭을 닫을 때만 동작합니다.
-
-**동기 확인 예제**
-
-```tsx
-import { useRegisterTabClose } from "@repo/ui/layout/mdi";
-import { useState } from "react";
-
-function NoticePage() {
-  const [isDirty, setIsDirty] = useState(false);
-
-  useRegisterTabClose("/notice", () => {
-    if (!isDirty) return true; // 변경사항 없으면 바로 닫기
-    return window.confirm("저장하지 않은 변경사항이 있습니다. 닫으시겠습니까?");
-  });
-
-  return <div>...</div>;
-}
-```
-
-**비동기 MUI Dialog 예제**
-
-```tsx
-import { useRegisterTabClose } from "@repo/ui/layout/mdi";
-import { useState } from "react";
-
-function NoticePage() {
-  const [isDirty, setIsDirty] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [resolve, setResolve] = useState<((v: boolean) => void) | null>(null);
-
-  useRegisterTabClose("/notice", () => {
-    if (!isDirty) return true;
-    return new Promise<boolean>((res) => {
-      setResolve(() => res); // 다이얼로그 확인/취소에서 res(true/false) 호출
-      setOpen(true);
-    });
-  });
-
-  return (
-    <>
-      {/* 폼 내용 */}
-      <ConfirmDialog
-        open={open}
-        onConfirm={() => { setOpen(false); resolve?.(true); }}
-        onCancel={() => { setOpen(false); resolve?.(false); }}
-      />
-    </>
-  );
-}
-```
-
----
-
-### 전체 예제 — `useTabState` + `useRegisterTabClose`
+> **주의:** 비활?????�면??보이지 ?�는 ?????�을 ?�는 콜백???�행?��? ?�습?�다.  
+> ?�재 ?�성 ??��?�만 ?�작?�니??
 
 ```tsx
 import { useTabState, useRegisterTabClose } from "@repo/ui/layout/mdi";
@@ -965,124 +789,145 @@ interface NoticeForm {
 const INITIAL_FORM: NoticeForm = { title: "", content: "" };
 
 export function NoticePage() {
-  // ① 탭 상태: 다른 탭 이동 후 복귀해도 입력값 유지
   const [form, setForm] = useTabState<NoticeForm>("/notice", INITIAL_FORM);
   const isDirty = form.title !== "" || form.content !== "";
 
-  // ② 탭 닫기 전 콜백: 입력값이 있으면 확인 요청
+  // isDirty(?�용???�으�? ??�� ?�기 ?�에 ?�인 창을 ?�시?�니??
   useRegisterTabClose("/notice", () => {
     if (!isDirty) return true;
-    return window.confirm("작성 중인 내용이 있습니다. 탭을 닫으시겠습니까?");
+    return window.confirm("?�성 중인 ?�용???�습?�다. ??�� ?�으?�겠?�니�?");
   });
-
-  const update = (field: keyof NoticeForm) => (value: string) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
 
   return (
     <form>
       <input
-        placeholder="제목"
+        placeholder="?�목"
         value={form.title}
-        onChange={(e) => update("title")(e.target.value)}
+        onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
       />
       <textarea
-        placeholder="내용"
+        placeholder="?�용"
         value={form.content}
-        onChange={(e) => update("content")(e.target.value)}
+        onChange={(e) => setForm((p) => ({ ...p, content: e.target.value }))}
       />
       <button type="button" onClick={() => setForm(INITIAL_FORM)}>
-        초기화
-      </button>
+        초기??      </button>
     </form>
   );
 }
 ```
 
-### MDI 탭 관련 파일 구조
+### MDI 관???�일 구조
 
 ```
 packages/ui/src/layout/mdi/
-├── index.ts                  ← public API (export 목록)
-├── MdiTabContext.tsx          ← Context + openTab / closeTab / activateTab
-├── MdiTabBar.tsx              ← 탭 바 UI
-├── MdiTabPanel.tsx            ← 탭 패널 (활성 탭만 마운트)
-├── useMdiTabStore.ts          ← Zustand persist 스토어 (탭 목록, activeId)
-├── useTabState.ts             ← useTabState 훅
-└── useRegisterTabClose.ts    ← useRegisterTabClose 훅
-
-src/shared/config/routes.ts   ← TAB_ROUTES (새 탭 등록은 여기만 수정)
-app/(main)/layout.tsx          ← MDI 레이아웃 (직접 수정 불필요)
+?��??� index.ts                  ???��??�서 import ?????�는 목록
+?��??� MdiTabContext.tsx          ??openTab / closeTab / activateTab 로직
+?��??� MdiTabBar.tsx              ???�단 ??�?UI
+?��??� MdiTabPanel.tsx            ?????�용 ?�널 (?�성 ??�� 마운??
+?��??� useMdiTabStore.ts          ????목록/?�성 ???�태 (Zustand)
+?��??� useTabState.ts             ??useTabState ???��??� useRegisterTabClose.ts    ??useRegisterTabClose ??
+src/shared/config/routes.ts   ??TAB_ROUTES ?�록 (?�기�??�정?�면 ?�니??
+app/(main)/layout.tsx          ??MDI ?�이?�웃 (?�정 불필??
 ```
 
 ---
 
-## 새 기능 넣을 때 (체크리스트)
+## ESLint / Prettier ?�정
 
-| 질문                                 | 넣을 곳                                    |
-| ------------------------------------ | ------------------------------------------ |
-| 새 URL 화면인가?                     | `app/.../page.tsx` + `src/screens/<name>/` |
-| 여러 feature를 한 블록으로 묶나?     | `src/widgets/<name>/`                      |
-| 사용자 액션(로그인, 필터, 제출)인가? | `src/features/<name>/`                     |
-| Notice, User 같은 **개념**인가?      | `src/entities/<name>/`                     |
-| 버튼·Input·테마                      | `@repo/ui` (`packages/ui`)                 |
-| Orval 생성 API·axios                 | `@repo/api-client`                         |
-| QueryClient·queryKeys                | `@repo/query`                              |
-| debounce 등 순수 유틸 hook           | `src/shared/lib/` (camelCase 파일명)       |
+### 권장 VSCode ?�장 ?�로그램
 
-**notice 목록 API 연동 예 (추가 시 권장 구조)**
+| ?�장 ID                  | ?�름       | ?�명                                             |
+| ------------------------ | ---------- | ------------------------------------------------ |
+| `dbaeumer.vscode-eslint` | ESLint     | JS/TS 린팅 규칙 ?�용                             |
+| `esbenp.prettier-vscode` | Prettier   | 코드 ?�동 ?�매??                                |
+| `eamodio.gitlens`        | GitLens    | Git blame, ?�스?�리, 브랜�???강력??Git ?�각??|
+| `usernamehw.errorlens`   | Error Lens | ?�러/경고�??�당 코드 줄에 ?�라?�으�??�시       |
 
+### 최초 ?�정 방법
+
+#### 1. ?�키지 ?�치
+
+```bash
+pnpm add -D prettier eslint-config-prettier
 ```
-src/entities/notice/
-  model/types.ts
-  ui/NoticeRow.tsx
-  index.ts
 
-src/features/noticeList/
-  api/getNotices.ts           # Orval 래핑
-  model/useNoticeList.ts
-  ui/NoticeList.tsx
-  index.ts
+#### 2. `.prettierrc` (?�로?�트 루트)
 
-src/screens/notice/
-  ui/NoticePage.tsx           # <NoticeList /> 조립만
+```json
+{
+  "semi": true,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "endOfLine": "lf"
+}
 ```
+
+#### 3. `.vscode/settings.json` (?�로?�트 루트)
+
+```json
+{
+  "eslint.useFlatConfig": true,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}
+```
+
+> ?�정 ??VSCode�??�시?�하거나 `Ctrl+Shift+P` ??**ESLint: Restart ESLint Server** �??�행?�니??
 
 ---
 
-## `app/` vs `src/` — Next colocation
+## 주요 ?�이브러�?버전
 
-| 패턴                                        | FSD에서                                    |
-| ------------------------------------------- | ------------------------------------------ |
-| `app/_components`, `app/_hooks`, `app/_lib` | 사용하지 않음 (비어 있으면 삭제)           |
-| 라우트 전용 코드                            | `screens` / `features` / `entities`로 이동 |
+| 분류                | ?�이브러�?                  | 버전        |
+| ------------------- | ---------------------------- | ----------- |
+| **?��???*          | Node.js                      | `>=20`      |
+| **?�키지 매니?�**   | pnpm                         | `10.26.1`   |
+| **빌드**            | Turbo                        | `^2.8.0`    |
+| **?�레?�워??*      | Next.js                      | `16.1.0`    |
+| **UI**              | React                        | `19.2.1`    |
+| **UI 컴포?�트**     | MUI (Material UI)            | `^7.3.11`   |
+| **?��???*          | Emotion React/Styled         | `^11.14.x`  |
+| **?�버 ?�태**       | TanStack Query (React Query) | `^5.100.14` |
+| **HTTP ?�라?�언??* | Axios                        | `^1.16.1`   |
+| **코드 ?�성**       | Orval                        | `^8.12.3`   |
+| **?�키�?검�?*     | Zod                          | `^4.4.3`    |
+| **??*              | React Hook Form              | `^7.77.0`   |
+| **차트**            | ECharts / echarts-for-react  | `^6.1.0`    |
+| **?�라?�언???�태** | Zustand                      | `^5.0.14`   |
+| **?�토리북**        | Storybook                    | `10.4.1`    |
+| **?�어**            | TypeScript                   | `^5.8.3`    |
+| **린터**            | ESLint                       | `^9.28.0`   |
+| **?�매??*          | Prettier                     | `^3.8.3`    |
 
 ---
 
-## 왜 `apps/web/app` 대신 루트 `app/`?
+## packages ?�영 규칙
 
-| 구조               | 적합한 경우                                |
-| ------------------ | ------------------------------------------ |
-| `apps/web/app/...` | web, admin, api 등 **배포 단위가 여러 개** |
-| `app/...` (루트)   | **서비스 1개** + 코드만 패키지로 분리      |
+`src`�?기능 중심?�로 ?�순?�하?�라??`packages`??공통 ?�프?�로 ?��??�니??
 
-지금처럼 서비스가 하나면 루트 `app/`이 경로도 짧고 설정도 단순합니다. monorepo 이점(공유 패키지, Orval, Query 설정 분리)은 그대로 유지됩니다.
+| ?�키지 | ??�� |
+| --- | --- |
+| `@repo/ui` | 버튼, ?? ?�이?�웃 ??범용 UI 컴포?�트 |
+| `@repo/api-client` | API ?�출/?�증/Orval ?�성 코드 |
+| `@repo/query` | TanStack Query Provider �?공통 ?�정 |
+| `@repo/types` | Zod + 공통 ?�???�키�?|
+| `@repo/typescript-config` | 모노?�포 공통 TS ?�정 |
 
-## 시작하기
+**?�떤 코드�?packages???�나??**
 
-```powershell
-corepack enable
-corepack prepare pnpm@10.26.1 --activate
-pnpm install
-pnpm dev
-```
+- ?�러 feature?�서 반복?�으�??�사?�되??코드
+- ???�로?�트 ???�른 ?�에?�도 ?????�는 코드
 
-## 스크립트
+**?�떤 코드??packages???��? ?�나??**
 
-| 명령             | 설명                         |
-| ---------------- | ---------------------------- |
-| `pnpm lint`      | ESLint (`eslint.config.mjs`) |
-| `pnpm dev`       | 개발 서버 (localhost:3000)   |
-| `pnpm build`     | Next 프로덕션 빌드           |
-| `pnpm codegen`   | Orval API 클라이언트 생성    |
-| `pnpm typecheck` | 루트 + packages 타입 검사    |
-| `pnpm storybook` | 스토리북 (localhost:6006)    |
+- ?�정 ?�메??공�??�항, Q&A ???�서�??�는 ?�???? 
+  ??`src/features/<name>/model/types.ts` ???�습?�다.
+- ?�면/기능??종속??API ?�핑 로직  
+  ??`src/features/<name>/api/` ???�습?�다.

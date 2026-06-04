@@ -3,6 +3,7 @@ import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from "axios";
+import { publicEnv } from "@repo/env/public";
 
 import { notifyAuthExpired } from "./auth/auth-session";
 import { shouldSkipTokenRefresh } from "./auth/is-auth-request";
@@ -10,7 +11,7 @@ import { refreshAccessToken } from "./auth/refresh-access-token";
 import { clearAuthTokens, getAccessToken } from "./auth/token-storage";
 
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080",
+  baseURL: publicEnv.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
   },

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
-import { LabeledSelect, type LabeledSelectProps } from "./labeled-select";
+import { LabeledSelect, type LabeledSelectProps } from "./LabeledSelect";
 
 const options = [
   { label: "전체", value: "all" },

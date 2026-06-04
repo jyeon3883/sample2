@@ -12,7 +12,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@repo/env": "workspace:*",
+    "@tanstack/react-query": "^5.100.14",
     "axios": "^1.16.1"
+  },
+  "peerDependencies": {
+    "react": "^19.2.1"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",

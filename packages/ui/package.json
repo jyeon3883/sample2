@@ -23,7 +23,8 @@
     "./layout/page-container": "./src/layout/PageContainer.tsx",
     "./layout/login-layout": "./src/layout/LoginLayout.tsx",
     "./layout/base-layout": "./src/layout/BaseLayout.tsx",
-    "./layout/mdi": "./src/layout/mdi/index.ts"
+    "./layout/mdi": "./src/layout/mdi/index.ts",
+    "./layout/mdi-shell": "./src/layout/mdi-shell/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -40,6 +41,7 @@
     "@storybook/react-vite": "10.4.1",
     "@types/react": "^19.2.0",
     "@types/react-dom": "19.2.0",
+    "next": "16.1.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "storybook": "10.4.1",
@@ -51,6 +53,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^7.3.11",
     "@mui/material": "^7.3.11",
+    "next": "^16.0.0",
     "react": "^19.2.1",
     "zustand": "^5.0.0"
   },
