@@ -78,7 +78,7 @@ $env:APP_TARGET="admin"; pnpm codegen
 | 위치 | 역할 |
 | --- | --- |
 | `apps/web/app/` | Next.js App Router 라우트 진입점 |
-| `apps/web/src/` | web 앱 비즈니스 코드 (FSD 계층) |
+| `apps/web/src/` | web 앱 비즈니스 코드 (4계층 Feature-Driven) |
 | `apps/admin/app/` | Admin Next.js App Router |
 | `apps/admin/src/` | admin 앱 전용 코드 |
 | `packages/env/` | 앱별 환경변수 Zod 검증 모듈 |
@@ -97,8 +97,46 @@ $env:APP_TARGET="admin"; pnpm codegen
 
 | 영역 | 위치 | 설명 |
 | --- | --- | --- |
-| 앱 코드 | `app/`, `src/` | 각 프로젝트에서만 사용하는 화면/기능 |
-| 공통 패키지 | `packages/` | 여러 프로젝트에서 재사용 가능한 소프트웨어 |
+| 앱 코드 | `apps/*/app/`, `apps/*/src/` | 각 앱에서만 쓰는 화면/기능 |
+| 공통 패키지 | `packages/` | web·admin이 함께 쓰는 UI, API, Query 등 |
+
+### 폴더 구조는 어떤 방식인가요?
+
+이 레포는 **Monorepo + 실용적 Feature-Driven(기능 중심) 4계층** 조합입니다.
+
+| 바깥 (Monorepo) | 안쪽 (앱 하나당) |
+| --- | --- |
+| `apps/web`, `apps/admin` — 배포 단위가 다른 앱 | `src/app` → `src/views` → `src/features` → `src/shared` |
+| `packages/*` — 앱들이 공유하는 인프라 | Next `app/` 폴더는 URL만 연결하는 **얇은 진입점** |
+
+**한 줄로 말하면:**  
+“앱은 기능(feature) 단위로 나누고, 화면(view)에서 기능을 조립하며, Next 라우트와 공통 패키지는 최대한 얇게 둔다.”
+
+**FSD(Feature-Sliced Design)와의 차이**
+
+| | FSD (전통) | 이 프로젝트 |
+| --- | --- | --- |
+| 레이어 수 | app, pages, widgets, features, entities, shared 등 6~7개 | **4개** (`app`, `views`, `features`, `shared`) |
+| 도메인 타입 | `entities/` 계층에 분리 | 각 `features/*/model/types.ts`에 **기능 안에 포함** |
+| 화면 조립 블록 | `widgets/`, `pages/` 등 역할 분산 | `views/` 한 곳에서 화면 조립 |
+| 목적 | 대규모 팀·엄격한 경계 | **초급자도 폴더를 빨리 찾을 수 있게** 단순화 |
+
+FSD의 “기능 단위로 코드를 나눈다”는 아이디어는 가져오되, 레이어 이름과 개수를 줄인 **Pragmatic Feature-Driven** 방식이라고 보면 됩니다.
+
+**각 계층을 이렇게 기억하면 됩니다**
+
+```
+Next app/          → "이 URL은 어떤 화면을 보여줄까?" (한 줄 re-export)
+src/views/         → "이 화면에 어떤 기능 블록을 배치할까?"
+src/features/      → "사용자가 하는 일 하나" (검색, 작성, 설정 저장 …)
+src/shared/        → "여러 화면/기능이 같이 쓰는 설정" (routes, appShell)
+packages/          → "앱 밖에서도 재사용 가능한 기술 인프라" (UI, API, Query)
+```
+
+> **왜 이렇게 나눴나요?**  
+> - 기능을 찾을 때 `features/기능이름/`만 보면 됩니다.  
+> - 같은 기능의 타입·훅·UI가 한 폴더에 모여 있어 수정 범위가 좁습니다.  
+> - `packages/`는 “비즈니스가 아닌 공통 기술”만 두어, 앱 코드와 역할이 섞이지 않습니다.
 
 ### URL이 화면에 표시되기까지
 
@@ -124,7 +162,7 @@ $env:APP_TARGET="admin"; pnpm codegen
 | 4 | `src/shared/` | 어디에나 쓰는 공통 설정/유틸 | `routes.ts` |
 
 > **규칙:** 위 계층은 아래 계층을 가져다 쓸 수 있지만, 아래가 위를 가져다 쓰면 안 됩니다.  
-> 예) `pages`는 `features`를 import 할 수 있지만, `features`가 `pages`를 import 하면 안 됩니다.
+> 예) `views`는 `features`를 import 할 수 있지만, `features`가 `views`를 import 하면 안 됩니다.
 
 ---
 
